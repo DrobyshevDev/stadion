@@ -18,7 +18,7 @@ import numpy as np
 
 from stadion.core.task import Brief, Task, View
 
-__all__ = ["Agent", "PolicyAgent", "RandomAgent", "ReferenceAgent"]
+__all__ = ["Agent", "NearestChoiceAgent", "PolicyAgent", "RandomAgent", "ReferenceAgent"]
 
 
 class Agent(ABC):
@@ -54,6 +54,38 @@ class PolicyAgent(Agent):
 
     def act(self, view: View) -> int:
         return int(self._policy(view.env, view.obs))
+
+
+class NearestChoiceAgent(Agent):
+    """Adapts a policy with a continuous action to the task's menu.
+
+    The classical rules for the battery and the supply chain emit a real-valued
+    action, while every player here picks from the same discrete menu. Snapping
+    the rule's action to the nearest option is what makes the two comparable —
+    and because the rule's free parameter is tuned *through* this wrapper, it is
+    tuned on the task as actually played, not on a continuous relaxation of it.
+    """
+
+    def __init__(self, policy: Callable[[Any, np.ndarray], Any], name: str) -> None:
+        self._policy = policy
+        self.name = name
+        self._menu_id: int | None = None
+        self._menu: np.ndarray = np.zeros((0, 0))
+        self._values: np.ndarray = np.zeros(0, dtype=np.int64)
+
+    def act(self, view: View) -> int:
+        # Tasks hand back the same menu object every step, so the action matrix
+        # is stacked once per instance rather than per decision.
+        if id(view.choices) != self._menu_id:
+            self._menu = np.stack(
+                [np.asarray(c.act, dtype=float).reshape(-1) for c in view.choices]
+            )
+            self._values = np.array([c.value for c in view.choices], dtype=np.int64)
+            self._menu_id = id(view.choices)
+
+        raw = np.asarray(self._policy(view.env, view.obs), dtype=float).reshape(-1)
+        nearest = int(np.argmin(((self._menu - raw) ** 2).sum(axis=1)))
+        return int(self._values[nearest])
 
 
 class RandomAgent(Agent):

@@ -80,7 +80,7 @@ jobs:
       - name: Run the reference arms through the ordinary evaluation path
         run: |
           set -euo pipefail
-          for task in inventory pricing queueing; do
+          for task in inventory pricing queueing energy supply-chain; do
             for agent in classical optimum; do
               stadion run "$task" --agent "$agent" --instances 10 --episodes 8
             done

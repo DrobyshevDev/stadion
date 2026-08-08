@@ -53,11 +53,25 @@ def _salt(name: str) -> int:
 
 @dataclass(frozen=True, slots=True)
 class Choice:
-    """One legal action, in the words the agent reads."""
+    """One legal action, in the words the agent reads.
+
+    ``value`` is what an agent returns and what a report refers to. ``action`` is
+    what reaches ``env.step``, and defaults to ``value`` itself — which is the
+    whole story for a discrete environment, where the choice *is* the action.
+    Environments with a continuous action space carry the vector here instead,
+    so the menu an agent reads stays a short list of numbered options no matter
+    what shape the underlying action has.
+    """
 
     value: int
     label: str
     detail: str = ""
+    action: Any = None
+
+    @property
+    def act(self) -> Any:
+        """What to pass to ``env.step``."""
+        return self.value if self.action is None else self.action
 
 
 @dataclass(frozen=True, slots=True)

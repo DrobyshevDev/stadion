@@ -26,6 +26,8 @@ def test_the_instance_salt_is_stable_across_processes() -> None:
     assert _salt("inventory") == 0x9067F6583BEC1104
     assert _salt("pricing") == 0xB89E47670523DB3E
     assert _salt("queueing") == 0x7415BA59A75C26E9
+    assert _salt("energy") == 0x014E017EB39655BA
+    assert _salt("supply-chain") == 0x27731B5B031D515F
 
 
 @pytest.mark.parametrize("task_name", TASKS)
@@ -40,8 +42,20 @@ def test_every_offered_choice_is_accepted_by_the_environment(task_name: str) -> 
     for choice in view.choices:
         probe = inst.env()
         probe.reset(seed=0)
-        probe.step(choice.value)  # must not raise, must not be silently clipped
-        assert env.action_space.contains(choice.value)
+        probe.step(choice.act)  # must not raise, must not be silently clipped
+        assert env.action_space.contains(choice.act)
+
+
+@pytest.mark.parametrize("task_name", TASKS)
+def test_choice_values_are_distinct_and_dense(task_name: str) -> None:
+    """An agent answering with a number must land on exactly one option."""
+    task = stadion.get(task_name)
+    inst = task.instance(0)
+    env = inst.env()
+    obs, _ = env.reset(seed=0)
+    values = [c.value for c in task.view(env, obs, 0, 0.0).choices]
+    assert values == sorted(set(values))
+    assert values == list(range(len(values)))
 
 
 @pytest.mark.parametrize("task_name", TASKS)
@@ -63,14 +77,15 @@ def test_the_brief_states_the_horizon_the_episode_actually_runs(task_name: str) 
     assert str(brief.horizon) in brief.text
 
     env = inst.env()
-    env.reset(seed=0)
+    obs, _ = env.reset(seed=0)
+    first = task.view(env, obs, 0, 0.0).choices[0].act
     steps, done = 0, False
     while not done:
-        _, _, terminated, truncated, _ = env.step(0)
+        _, _, terminated, truncated, _ = env.step(first)
         steps += 1
         done = terminated or truncated
-    # Choosing 0 every step can end a task early (selling out is impossible at
-    # zero orders, but a queue can only truncate), never late.
+    # Taking the first option every step can end a task early — selling out ends
+    # pricing — but never late.
     assert steps <= brief.horizon
 
 

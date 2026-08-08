@@ -87,7 +87,7 @@ def _cmd_verify(args: argparse.Namespace) -> int:
             ok = abs(z) <= args.max_z
             failures += not ok
             print(
-                f"{'ok ' if ok else 'BAD'} {task.name:<10} seed {seed:<3} "
+                f"{'ok ' if ok else 'BAD'} {task.name:<13} seed {seed:<3} "
                 f"analytic {analytic:9.3f}  simulated {returns.mean():9.3f} "
                 f"+- {error:5.3f}   z = {z:+5.2f}"
             )

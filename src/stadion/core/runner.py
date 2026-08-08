@@ -17,22 +17,28 @@ arms are compared, and why ``episodes`` is a knob rather than a constant.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 
 import numpy as np
 
 from stadion.core.agent import Agent
 from stadion.core.score import Comparison, Report, paired_bootstrap
-from stadion.core.task import Instance, Task
+from stadion.core.task import Brief, Instance, Task
 
-__all__ = ["Arms", "evaluate", "play_episode", "play_instance", "reproducible"]
+__all__ = ["Arms", "evaluate", "play_episode", "play_instance", "reproducible", "tune"]
 
 
-def play_episode(task: Task, agent: Agent, inst: Instance, seed: int) -> float:
-    """One episode. Returns the undiscounted total reward."""
+def play_episode(
+    task: Task, agent: Agent, inst: Instance, seed: int, brief: Brief | None = None
+) -> float:
+    """One episode. Returns the undiscounted total reward.
+
+    ``brief`` is accepted so a caller running many episodes on one instance can
+    build it once; it is the same object either way.
+    """
     env = inst.env()
-    agent.start(task.brief(inst))
+    agent.start(task.brief(inst) if brief is None else brief)
     obs, _ = env.reset(seed=seed)
     earned, step, done = 0.0, 0, False
     while not done:
@@ -40,8 +46,7 @@ def play_episode(task: Task, agent: Agent, inst: Instance, seed: int) -> float:
         chosen = agent.act(view)
         # Environments clip out-of-range actions silently; refusing them here
         # turns a broken agent into an error instead of a quiet bad score.
-        view.choice(chosen)
-        obs, reward, terminated, truncated, _ = env.step(chosen)
+        obs, reward, terminated, truncated, _ = env.step(view.choice(chosen).act)
         earned += float(reward)
         step += 1
         done = terminated or truncated
@@ -52,7 +57,32 @@ def play_instance(
     task: Task, agent: Agent, inst: Instance, episode_seeds: Sequence[int]
 ) -> float:
     """Mean return of one agent on one instance."""
-    return float(np.mean([play_episode(task, agent, inst, s) for s in episode_seeds]))
+    brief = task.brief(inst)
+    return float(np.mean([play_episode(task, agent, inst, s, brief) for s in episode_seeds]))
+
+
+def tune(
+    task: Task,
+    inst: Instance,
+    build: Callable[[float], Agent],
+    candidates: Iterable[float],
+) -> float:
+    """Pick the classical rule's free parameter on seeds held out of the evaluation.
+
+    The search evaluates the rule exactly as it will be played — including the
+    snap to the task's action menu, where there is one. Tuning on a continuous
+    relaxation and then playing the discretised version would hand the agent a
+    baseline that was never optimised for the game either of them is in.
+    """
+    seeds = tuple(task.tuning_seed + j for j in range(task.tuning_episodes))
+    best_param, best_return = None, -np.inf
+    for param in candidates:
+        earned = play_instance(task, build(float(param)), inst, seeds)
+        if earned > best_return:
+            best_param, best_return = float(param), earned
+    if best_param is None:
+        raise ValueError("tune() needs at least one candidate parameter")
+    return best_param
 
 
 @dataclass(frozen=True, slots=True)
