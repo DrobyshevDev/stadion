@@ -84,7 +84,11 @@ ignore = ["E501"]
 known-first-party = ["stadion"]
 
 [tool.mypy]
-python_version = "3.10"
+# Analysis target, not the support floor. NumPy's current stubs use PEP 695
+# `type` statements, which mypy refuses to parse under an older target, so the
+# analysis runs at 3.12 while runtime support for 3.10 is unchanged and is
+# exercised by the 3.10 test job in CI.
+python_version = "3.12"
 files = ["src/stadion"]
 ignore_missing_imports = true
 disallow_untyped_defs = true

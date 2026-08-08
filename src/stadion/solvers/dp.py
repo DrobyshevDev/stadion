@@ -102,8 +102,8 @@ def solve_inventory(
     # Post-order stock reachable from on-hand x by ordering a, and the warehouse cap.
     reachable = np.minimum(levels[:, None] + orders[None, :], m)
 
-    value_next = np.zeros(m + 1)
-    actions = np.zeros((horizon, m + 1), dtype=np.int64)
+    value_next: np.ndarray = np.zeros(m + 1)
+    actions: np.ndarray = np.zeros((horizon, m + 1), dtype=np.int64)
 
     for t in range(horizon - 1, -1, -1):
         # g[y] = E_D[ immediate(y, D) + V_{t+1}(leftover(y, D)) ]
@@ -161,8 +161,8 @@ def solve_pricing(
         sales = np.minimum(stock[:, None], demand[None, :])
         tables.append((float(price), pmf, sales, stock[:, None] - sales))
 
-    value_next = np.zeros(inv0 + 1)
-    actions = np.zeros((horizon, inv0 + 1), dtype=np.int64)
+    value_next: np.ndarray = np.zeros(inv0 + 1)
+    actions: np.ndarray = np.zeros((horizon, inv0 + 1), dtype=np.int64)
 
     for t in range(horizon - 1, -1, -1):
         candidates = np.empty((inv0 + 1, len(tables)))
@@ -223,8 +223,8 @@ def solve_queue(
     room = queues < b
     pi = expect(room.astype(float))  # probability there is room after service
 
-    w_next = np.zeros(b + 1)  # E_value[ V_{t+1}(q, value) ]
-    thresholds = np.empty((horizon, b + 1))
+    w_next: np.ndarray = np.zeros(b + 1)  # E_value[ V_{t+1}(q, value) ]
+    thresholds: np.ndarray = np.empty((horizon, b + 1))
 
     for t in range(horizon - 1, -1, -1):
         reject = expect(-h * queues + w_next)
