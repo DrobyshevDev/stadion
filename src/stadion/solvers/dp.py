@@ -48,7 +48,7 @@ def poisson_pmf(lam: float, support: int | None = None) -> np.ndarray:
     if support is None:
         support = int(lam + 10.0 * np.sqrt(lam) + 20.0)
     k = np.arange(support + 1)
-    log_factorial = np.cumsum(np.log(np.maximum(k, 1)))
+    log_factorial: np.ndarray = np.cumsum(np.log(np.maximum(k, 1)))
     logpmf = -lam + k * np.log(lam) - log_factorial
     pmf = np.exp(logpmf)
     return pmf / pmf.sum()

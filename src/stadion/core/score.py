@@ -86,8 +86,8 @@ def paired_bootstrap(
     they are the same instance, which is the point of pairing. ``seed`` fixes
     the resampling, so the interval is reproducible run to run.
     """
-    arr_a = np.asarray(a, dtype=float)
-    arr_b = np.asarray(b, dtype=float)
+    arr_a: np.ndarray = np.asarray(a, dtype=float)
+    arr_b: np.ndarray = np.asarray(b, dtype=float)
     if arr_a.shape != arr_b.shape:
         raise ValueError(f"arms have different lengths: {arr_a.shape} vs {arr_b.shape}")
     n = int(arr_a.size)
