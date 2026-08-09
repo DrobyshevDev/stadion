@@ -6,7 +6,7 @@
 «неотличим от классического метода» здесь полноценный исход, а не погрешность
 округления.
 
-[English version](README.md)
+[English version](https://github.com/DrobyshevDev/stadion/blob/main/README.md)
 
 ---
 

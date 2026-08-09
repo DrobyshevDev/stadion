@@ -6,7 +6,7 @@ the problem, and the exact optimum. The result is a normalised score with a
 confidence interval — and *"indistinguishable from the classical method"* is a
 first-class outcome, not a rounding error.
 
-[Русская версия](README.ru.md)
+[Русская версия](https://github.com/DrobyshevDev/stadion/blob/main/README.ru.md)
 
 ---
 

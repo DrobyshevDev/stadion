@@ -62,7 +62,7 @@ Issues = "https://github.com/DrobyshevDev/stadion/issues"
 packages = ["src/stadion"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src/stadion", "tests", "README.md", "LICENSE"]
+include = ["src/stadion", "tests", "examples", "README.md", "README.ru.md", "LICENSE"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
