@@ -28,6 +28,7 @@ def test_the_instance_salt_is_stable_across_processes() -> None:
     assert _salt("queueing") == 0x7415BA59A75C26E9
     assert _salt("energy") == 0x014E017EB39655BA
     assert _salt("supply-chain") == 0x27731B5B031D515F
+    assert _salt("joint-pricing") == 0xC9B14D22C4A41B98
 
 
 @pytest.mark.parametrize("task_name", TASKS)
@@ -110,5 +111,9 @@ def test_the_tool_schema_offers_exactly_the_legal_choices(task_name: str) -> Non
 
 
 def test_an_unknown_task_name_lists_the_known_ones() -> None:
-    with pytest.raises(KeyError, match="inventory, pricing, queueing"):
+    with pytest.raises(KeyError) as excinfo:
         stadion.get("warehouse")
+    message = str(excinfo.value)
+    assert "warehouse" in message
+    for known in TASKS:
+        assert known in message

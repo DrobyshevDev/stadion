@@ -13,9 +13,11 @@ import pytest
 from decisionrl.envs import EnergyMicrogrid
 
 import stadion
+from stadion.solvers.joint import solve_joint_pricing
 from stadion.solvers.serial import solve_supply_chain
 from stadion.solvers.storage import expected_exogenous, solve_energy
 from stadion.tasks.energy import LEVELS
+from stadion.tasks.joint import PRICE_ACTIONS, decode_price, demand_mean
 
 
 def test_the_battery_profile_means_match_the_environment_that_draws_them() -> None:
@@ -65,6 +67,55 @@ def test_the_battery_lattice_stays_affordable_for_every_instance_the_task_draws(
     for seed in range(30):
         solution = task._solve(task.instance(seed))
         assert solution.lattice <= 20_000
+
+
+def test_letting_the_price_answer_to_the_stock_is_worth_something() -> None:
+    """The joint task has to contain the coupling it is named for.
+
+    Holding one price for the whole episode is a special case of the joint
+    policy, so the joint optimum can never be lower. What has to be checked is
+    that it is sometimes strictly higher — otherwise the task collapses to the
+    pricing task with extra steps, and every score on it would be measuring
+    ordering alone.
+
+    Measured across the first eight instances the advantage runs from 0.7% to
+    5.5% of the return. Real, and a good deal smaller than the environment's own
+    docstring implies.
+    """
+    task = stadion.get("joint-pricing")
+    advantages = []
+    for seed in range(8):
+        inst = task.instance(seed)
+        p = inst.params
+        prices = np.array([decode_price(float(a)) for a in PRICE_ACTIONS])
+        means = np.array(
+            [demand_mean(price, p["base_demand"], p["elasticity"]) for price in prices]
+        )
+        shared = {
+            "order_levels": task._order_levels(int(p["max_order"])),
+            "max_inventory": int(p["max_inventory"]),
+            "unit_cost": p["unit_cost"],
+            "holding_cost": p["holding_cost"],
+            "stockout_penalty": p["stockout_penalty"],
+            "horizon": int(p["horizon"]),
+        }
+        joint = solve_joint_pricing(prices=prices, demand_means=means, **shared)
+        best_fixed = max(
+            solve_joint_pricing(
+                prices=prices[i : i + 1], demand_means=means[i : i + 1], **shared
+            ).value
+            for i in range(prices.size)
+        )
+        assert joint.value >= best_fixed - 1e-9, (
+            f"seed {seed}: a fixed price is available to the joint policy, so it "
+            f"cannot score above it ({best_fixed:.3f} vs {joint.value:.3f})"
+        )
+        advantages.append((joint.value - best_fixed) / abs(best_fixed))
+
+    assert max(advantages) > 0.005, (
+        f"state-dependent pricing bought at most {max(advantages):.3%}; the task is "
+        f"not exercising the coupling it exists for"
+    )
 
 
 def test_the_supply_chain_optimum_does_not_move_when_the_state_cap_is_raised() -> None:

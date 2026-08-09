@@ -102,6 +102,7 @@ stadion run inventory --agent optimum --instances 30
 | `queueing` | admit or reject each arriving job into a finite buffer | the strongest fixed value threshold, tuned by search | backward induction with the job value integrated in closed form |
 | `energy` | when to charge and discharge a battery against a daily price cycle | the strongest fixed price threshold, tuned by search | backward induction over the charge lattice |
 | `supply-chain` | how much to order at two echelons, a period before it can help | per-echelon base-stock, tuned by search | backward induction over the collapsed two-dimensional state |
+| `joint-pricing` | what to charge and how much to restock, decided together | the strongest static price-and-target pair, tuned jointly | backward induction over on-hand stock |
 
 Environments and the classical policies come from
 [decisionrl](https://github.com/DrobyshevDev/decisionrl) unmodified, so the
@@ -122,6 +123,7 @@ Measured over 40 instances × 20 episodes; reproduce with
 | Task | Classical | Optimum | Headroom | 95% interval |
 |---|---:|---:|---:|---|
 | `inventory` | 204.141 | 204.890 | **+0.4%** | [+0.561, +1.031] |
+| `joint-pricing` | 110.099 | 114.812 | +4.3% | [+3.794, +5.656] |
 | `pricing` | 24.490 | 26.006 | +6.2% | [+1.265, +1.761] |
 | `queueing` | 21.911 | 25.611 | +16.9% | [+3.418, +3.988] |
 | `supply-chain` | −37.532 | −31.027 | +17.3% | [+5.505, +7.493] |
@@ -134,6 +136,15 @@ the exact optimum — there is almost nothing to win on `inventory`, and an agen
 that reports a large improvement there has a bug, not a policy. A benchmark whose
 tasks all have generous headroom has quietly selected for problems where the
 classical answer is bad.
+
+`joint-pricing` is the case that changed our mind about something. Its
+environment is built around a coupling — the right price depends on how much
+stock is on the shelf, so no fixed price can be right — and that is true. Priced
+out, letting the price answer to the stock is worth 4.3%. Real, measurable, and
+a good deal smaller than "no static rule is right" suggests. The number is
+sensitive to how fine the price menu is (2.2% over six prices, 3.2% over eight,
+3.6% over twelve), which is why the menu is set where that has mostly stopped
+moving rather than where the headline looks best.
 
 ## The protocol
 
@@ -182,13 +193,13 @@ its own policy is the failure this is built to catch, and it runs in CI.
 
 ## Status
 
-v0.1 — five tasks, exact optima, the scoring protocol. Not yet on PyPI.
+v0.1 — six tasks, exact optima, the scoring protocol. Not yet on PyPI.
 
-The list is short because a problem earns a place by being solvable outright,
-and most operational problems are not. Joint pricing-and-inventory is the
-obvious next candidate; whether its optimum is reachable without an
-approximation is the open question, and it will not ship until that is settled
-one way or the other.
+That is every applied environment in `decisionrl`, each with its optimum
+computed rather than estimated. Anything added next has to clear the same bar,
+and most operational problems do not: the moment a state has three continuous
+dimensions that will not collapse, the ceiling stops being a fact and starts
+being another policy's opinion.
 
 Issues and pull requests welcome.
 

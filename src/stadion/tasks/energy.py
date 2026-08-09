@@ -40,7 +40,7 @@ __all__ = ["Energy"]
 LEVELS = np.linspace(-1.0, 1.0, 9)
 
 #: Thresholds searched for the classical rule, matching decisionrl's own range.
-THRESHOLDS = np.linspace(0.2, 0.5, 7)
+THRESHOLDS = tuple(float(t) for t in np.linspace(0.2, 0.5, 7))
 
 
 class _Optimal(Agent):

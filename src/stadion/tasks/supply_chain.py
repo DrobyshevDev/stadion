@@ -43,7 +43,7 @@ __all__ = ["SupplyChainTask"]
 FRACTIONS = np.linspace(0.0, 1.0, 5)
 
 #: Base-stock targets searched for the classical rule.
-TARGETS = np.arange(6, 26)
+TARGETS = tuple(float(t) for t in range(6, 26))
 
 #: Stock beyond this saturates the environment's own observation, so neither the
 #: recurrence nor an agent can see past it. It is the environment's normalisation

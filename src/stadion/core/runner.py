@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
+from typing import TypeVar
 
 import numpy as np
 
@@ -27,6 +28,11 @@ from stadion.core.score import Comparison, Report, paired_bootstrap
 from stadion.core.task import Brief, Instance, Task
 
 __all__ = ["Arms", "evaluate", "play_episode", "play_instance", "reproducible", "tune"]
+
+#: The classical rules differ in what they have to tune: one threshold for the
+#: battery, one base-stock target for the chain, a (price, target) pair when the
+#: two decisions are coupled.
+P = TypeVar("P")
 
 
 def play_episode(
@@ -64,9 +70,9 @@ def play_instance(
 def tune(
     task: Task,
     inst: Instance,
-    build: Callable[[float], Agent],
-    candidates: Iterable[float],
-) -> float:
+    build: Callable[[P], Agent],
+    candidates: Iterable[P],
+) -> P:
     """Pick the classical rule's free parameter on seeds held out of the evaluation.
 
     The search evaluates the rule exactly as it will be played — including the
@@ -75,11 +81,12 @@ def tune(
     baseline that was never optimised for the game either of them is in.
     """
     seeds = tuple(task.tuning_seed + j for j in range(task.tuning_episodes))
-    best_param, best_return = None, -np.inf
+    best_param: P | None = None
+    best_return = -np.inf
     for param in candidates:
-        earned = play_instance(task, build(float(param)), inst, seeds)
+        earned = play_instance(task, build(param), inst, seeds)
         if earned > best_return:
-            best_param, best_return = float(param), earned
+            best_param, best_return = param, earned
     if best_param is None:
         raise ValueError("tune() needs at least one candidate parameter")
     return best_param
