@@ -1,0 +1,41 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly, because advisories land between pushes: a rule added after the
+    # last commit would otherwise never run against this code.
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze Python
+    runs-on: ubuntu-latest
+    # Code scanning on a private repository needs GitHub Advanced Security.
+    # Skipped rather than left permanently red, and it starts running by itself
+    # if the repository ever goes private and comes back.
+    if: github.event.repository.visibility == 'public'
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: python
+          # security-and-quality over the default: this service parses untrusted
+          # documents and serves HTTP, so the extra checks earn their noise.
+          queries: security-and-quality
+
+      - uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:python"
