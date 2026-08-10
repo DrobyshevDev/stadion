@@ -1,0 +1,33 @@
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "deps"
+    # torch, numpy and scipy are pinned by a lower bound on purpose: it says
+    # which versions a user may already have, not which version CI runs. pip
+    # installs the newest match either way, so raising the floor buys nothing
+    # and locks users out.
+    ignore:
+      - dependency-name: torch
+      - dependency-name: numpy
+      - dependency-name: scipy
+    groups:
+      dev-tooling:
+        patterns: ["ruff", "mypy", "pytest*"]
+    open-pull-requests-limit: 5
