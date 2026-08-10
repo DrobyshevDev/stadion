@@ -87,6 +87,35 @@ def test_a_deterministic_agent_reproduces_its_own_returns(task_name: str) -> Non
     assert stadion.reproducible(task, stadion.RandomAgent())
 
 
+def test_running_instances_concurrently_changes_nothing_but_the_wall_clock() -> None:
+    """Concurrency is for agents that wait on a network, not a different measurement.
+
+    Every seed is fixed before the pool starts and rows are collected by index,
+    so the numbers have to come out bit-identical. If they ever do not, the
+    scores stop being reproducible and the benchmark stops being one.
+    """
+    task = stadion.get("pricing")
+    serial = stadion.evaluate(task, _First(), instances=6, episodes=4)
+    parallel = stadion.evaluate(task, _First, instances=6, episodes=4, workers=4)
+    assert serial.agent_return == parallel.agent_return
+    assert serial.baseline_return == parallel.baseline_return
+    assert serial.optimal_return == parallel.optimal_return
+    assert serial.vs_baseline.ci == parallel.vs_baseline.ci
+
+
+def test_sharing_one_agent_across_workers_is_refused() -> None:
+    """An agent that remembers the episode cannot be shared; say so before the run."""
+    task = stadion.get("pricing")
+    with pytest.raises(ValueError, match="factory"):
+        stadion.evaluate(task, _First(), instances=4, episodes=2, workers=4)
+
+
+def test_a_factory_is_accepted_on_a_single_worker_too() -> None:
+    task = stadion.get("pricing")
+    report = stadion.evaluate(task, _First, instances=4, episodes=2)
+    assert report.agent == "first"
+
+
 def test_an_evaluation_needs_enough_instances_for_an_interval() -> None:
     task = stadion.get("queueing")
     with pytest.raises(ValueError, match="at least 2 instances"):

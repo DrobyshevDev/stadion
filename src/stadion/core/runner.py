@@ -18,6 +18,7 @@ arms are compared, and why ``episodes`` is a knob rather than a constant.
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import TypeVar
 
@@ -104,7 +105,7 @@ class Arms:
 
 def evaluate(
     task: Task,
-    agent: Agent,
+    agent: Agent | Callable[[], Agent],
     *,
     instances: int = 30,
     episodes: int = 20,
@@ -113,25 +114,67 @@ def evaluate(
     resamples: int = 10_000,
     level: float = 0.95,
     bootstrap_seed: int = 0,
+    workers: int = 1,
 ) -> Report:
-    """Score ``agent`` on ``task`` against the classical method and the optimum."""
+    """Score ``agent`` on ``task`` against the classical method and the optimum.
+
+    ``workers`` runs instances concurrently. It exists for agents that wait on a
+    network: a decision cannot start until the previous one's outcome is known,
+    so an episode is a chain of round-trips and a language model spends the
+    evaluation waiting rather than computing. Instances do not depend on each
+    other, so they overlap freely, and the result is identical either way —
+    every seed is fixed in advance and the rows are collected by index.
+
+    Above one worker, ``agent`` must be a factory rather than an instance: an
+    agent that remembers anything within an episode — as one driving a language
+    model must — cannot be shared across threads without its memory interleaving.
+    """
     if instances < 2:
         raise ValueError(f"need at least 2 instances for an interval, got {instances}")
+    if workers < 1:
+        raise ValueError(f"workers must be at least 1, got {workers}")
     episode_seeds = tuple(episode_seed + j for j in range(episodes))
 
-    rows_agent, rows_base, rows_opt = [], [], []
-    for i in range(instances):
-        inst = task.instance(instance_seed + i)
-        rows_agent.append(play_instance(task, agent, inst, episode_seeds))
-        rows_base.append(play_instance(task, task.baseline(inst), inst, episode_seeds))
-        rows_opt.append(play_instance(task, task.optimal(inst), inst, episode_seeds))
+    if isinstance(agent, Agent):
+        if workers > 1:
+            raise ValueError(
+                "workers > 1 needs a factory, not an agent instance.\n"
+                "  An agent that keeps state within an episode would have that state "
+                "interleaved across threads.\n"
+                "  Pass a zero-argument callable that returns a fresh agent, e.g. "
+                "evaluate(task, lambda: MyAgent(), workers=8)."
+            )
+        shared = agent
+
+        def build() -> Agent:
+            return shared
+
+        name = agent.name
+    else:
+        build = agent
+        name = build().name
+
+    def one(index: int) -> tuple[float, float, float]:
+        inst = task.instance(instance_seed + index)
+        return (
+            play_instance(task, build(), inst, episode_seeds),
+            play_instance(task, task.baseline(inst), inst, episode_seeds),
+            play_instance(task, task.optimal(inst), inst, episode_seeds),
+        )
+
+    if workers == 1:
+        rows = [one(i) for i in range(instances)]
+    else:
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            rows = list(pool.map(one, range(instances)))
 
     arms = Arms(
         seeds=tuple(instance_seed + i for i in range(instances)),
-        agent=np.asarray(rows_agent),
-        baseline=np.asarray(rows_base),
-        optimal=np.asarray(rows_opt),
+        agent=np.asarray([r[0] for r in rows]),
+        baseline=np.asarray([r[1] for r in rows]),
+        optimal=np.asarray([r[2] for r in rows]),
     )
+
     def compare(x: np.ndarray, y: np.ndarray, label: str) -> Comparison:
         return paired_bootstrap(
             x, y, label=label, resamples=resamples, level=level, seed=bootstrap_seed
@@ -139,7 +182,7 @@ def evaluate(
 
     return Report(
         task=task.name,
-        agent=agent.name,
+        agent=name,
         instances=instances,
         episode_seeds=episode_seeds,
         agent_return=float(arms.agent.mean()),
