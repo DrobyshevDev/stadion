@@ -1,0 +1,71 @@
+site_name: stadion
+site_description: >-
+  A proving ground for operational decisions. An agent is scored against the
+  tuned classical method and the exact optimum, with a confidence interval.
+site_url: https://drobyshevdev.github.io/stadion/
+repo_url: https://github.com/DrobyshevDev/stadion
+repo_name: DrobyshevDev/stadion
+edit_uri: edit/main/docs/
+copyright: MIT.
+
+theme:
+  name: material
+  language: en
+  # The theme otherwise pulls Roboto from Google Fonts on every page load. The
+  # typography here is a system stack set in theme.css, so that request buys the
+  # reader nothing and costs them a third party.
+  font: false
+  features:
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - content.action.edit
+    - search.suggest
+    - search.highlight
+    - toc.follow
+  # One scheme, dark, as everywhere else in the organisation. A toggle means
+  # designing the whole thing twice, and the second design is the one nobody
+  # checks.
+  palette:
+    scheme: slate
+    primary: black
+    accent: indigo
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_css:
+  - assets/theme.css
+
+nav:
+  - stadion: index.md
+  - The tasks: tasks.md
+  - Writing an agent: agents.md
+  - The protocol: protocol.md
+  - Checking the harness: verify.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/DrobyshevDev/stadion
