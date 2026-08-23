@@ -193,7 +193,9 @@ its own policy is the failure this is built to catch, and it runs in CI.
 
 ## Status
 
-v0.1 — six tasks, exact optima, the scoring protocol. Not yet on PyPI.
+v0.1 — six tasks, exact optima, the scoring protocol.
+[On PyPI](https://pypi.org/project/stadion-rl/) as `stadion-rl`;
+[documentation](https://drobyshevdev.github.io/stadion/).
 
 That is every applied environment in `decisionrl`, each with its optimum
 computed rather than estimated. Anything added next has to clear the same bar,

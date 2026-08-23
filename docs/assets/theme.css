@@ -1,0 +1,23 @@
+/* The theme is configured with `font: false`, which stops Material pulling
+   Roboto from Google Fonts on every page load. That request buys the reader
+   nothing and costs them a third party, so the typography is a system stack
+   resolved locally instead. */
+
+:root {
+  --md-text-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --md-code-font: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+}
+
+/* Every table on this site is a table of measurements. Figures line up on the
+   decimal, and the numeric columns are right-aligned so orders of magnitude are
+   comparable down the column rather than only readable across the row. */
+.md-typeset table:not([class]) {
+  font-variant-numeric: tabular-nums;
+}
+
+.md-typeset table:not([class]) td:nth-child(n + 2),
+.md-typeset table:not([class]) th:nth-child(n + 2) {
+  white-space: nowrap;
+}

@@ -1,0 +1,3 @@
+# Building the documentation only. Kept out of the package's own extras so
+# installing stadion never pulls a site generator.
+mkdocs-material>=9.7.7
