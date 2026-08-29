@@ -1,0 +1,38 @@
+{
+  "upload_type": "software",
+  "title": "stadion — a proving ground for operational decisions",
+  "description": "An evaluation harness for agents on operational decision tasks. Each task ships two reference arms: the tuned classical method and the optimum computed by dynamic programming. A score is reported with a confidence interval and placed on that scale, so a result is expressed as a distance from the best achievable outcome rather than as a leaderboard position.",
+  "creators": [
+    {
+      "name": "Drobyshev, Denis",
+      "affiliation": "DrobyshevDev"
+    }
+  ],
+  "license": "mit",
+  "keywords": [
+    "agent-evaluation",
+    "benchmark",
+    "reinforcement-learning",
+    "operations-research",
+    "llm-agents"
+  ],
+  "access_right": "open",
+  "communities": [
+    {
+      "identifier": "drobyshevdev"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/DrobyshevDev/stadion",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://drobyshevdev.github.io/stadion/",
+      "relation": "isDocumentedBy",
+      "resource_type": "publication-softwaredocumentation"
+    }
+  ],
+  "language": "eng"
+}
