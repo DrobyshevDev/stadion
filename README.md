@@ -6,6 +6,14 @@ the problem, and the exact optimum. The result is a normalised score with a
 confidence interval — and *"indistinguishable from the classical method"* is a
 first-class outcome, not a rounding error.
 
+[![CI](https://github.com/DrobyshevDev/stadion/actions/workflows/ci.yml/badge.svg)](https://github.com/DrobyshevDev/stadion/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/DrobyshevDev/stadion/actions/workflows/codeql.yml/badge.svg)](https://github.com/DrobyshevDev/stadion/actions/workflows/codeql.yml)
+[![Coverage](https://codecov.io/gh/DrobyshevDev/stadion/branch/main/graph/badge.svg)](https://codecov.io/gh/DrobyshevDev/stadion)
+[![PyPI](https://img.shields.io/pypi/v/stadion-rl.svg)](https://pypi.org/project/stadion-rl/)
+[![Python](https://img.shields.io/pypi/pyversions/stadion-rl.svg)](https://pypi.org/project/stadion-rl/)
+[![License](https://img.shields.io/pypi/l/stadion-rl.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-mkdocs--material-blue.svg)](https://drobyshevdev.github.io/stadion/)
+
 [Русская версия](https://github.com/DrobyshevDev/stadion/blob/main/README.ru.md)
 
 ---
