@@ -55,6 +55,7 @@ stadion = "stadion.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/DrobyshevDev/stadion"
+Documentation = "https://drobyshevdev.github.io/stadion/"
 Repository = "https://github.com/DrobyshevDev/stadion"
 Issues = "https://github.com/DrobyshevDev/stadion/issues"
 
