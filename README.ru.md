@@ -9,6 +9,7 @@
 [![CI](https://github.com/DrobyshevDev/stadion/actions/workflows/ci.yml/badge.svg)](https://github.com/DrobyshevDev/stadion/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/DrobyshevDev/stadion/actions/workflows/codeql.yml/badge.svg)](https://github.com/DrobyshevDev/stadion/actions/workflows/codeql.yml)
 [![Coverage](https://codecov.io/gh/DrobyshevDev/stadion/branch/main/graph/badge.svg)](https://codecov.io/gh/DrobyshevDev/stadion)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/DrobyshevDev/stadion/badge)](https://scorecard.dev/viewer/?uri=github.com/DrobyshevDev/stadion)
 [![PyPI](https://img.shields.io/pypi/v/stadion-rl.svg)](https://pypi.org/project/stadion-rl/)
 [![Python](https://img.shields.io/pypi/pyversions/stadion-rl.svg)](https://pypi.org/project/stadion-rl/)
 [![License](https://img.shields.io/pypi/l/stadion-rl.svg)](LICENSE)
