@@ -1,0 +1,54 @@
+name: Headroom table
+
+# Recomputes every row of the headroom table in both READMEs, at the instance
+# and episode counts the README itself quotes, and fails if a published figure
+# has stopped being the figure the benchmark produces.
+#
+# Why this is not in CI: the six tasks do not cost the same. A full pass is
+# 855s, of which `joint-pricing` alone is 626 and `inventory` is 7. Fourteen
+# minutes in front of every push is the wrong trade in a repository where
+# branch protection already makes a branch re-run its checks every time
+# something else merges. CI recomputes `inventory` on every push -- seconds,
+# and the row the strongest claim in the README rests on -- and the rest is
+# checked here, weekly.
+#
+# A change to a task, a solver or the scoring protocol is exactly what moves
+# these numbers, and exactly the change whose author is least likely to think
+# of a table two files away.
+
+on:
+  schedule:
+    - cron: "15 2 * * 6"   # weekly, Saturday 02:15 UTC, before Scorecard
+  workflow_dispatch:
+  # Also on a push that touches the things the numbers come from, so a change
+  # that moves them is caught by the person making it rather than on Saturday.
+  push:
+    branches: [main]
+    paths:
+      - "src/stadion/tasks/**"
+      - "src/stadion/solvers/**"
+      - "src/stadion/core/score.py"
+      - "README.md"
+      - "README.ru.md"
+
+permissions:
+  contents: read
+
+jobs:
+  headroom:
+    name: every published figure is reproduced
+    runs-on: ubuntu-latest
+    timeout-minutes: 45     # a full pass is ~15; this catches a hang, not a slow day
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -e ".[dev]"
+      - name: Recompute the whole table
+        run: python scripts/check_readme.py --all

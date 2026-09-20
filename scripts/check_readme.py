@@ -15,11 +15,13 @@ Two tiers, because the six tasks do not cost the same:
                 language tables agreeing with each other, and `inventory`
                 recomputed in full -- seconds, so it runs on every push
 
-  --all         every row recomputed. `joint-pricing` is the reason this is not
-                on the push path: at the documented 40x20 it was still running
-                after half an hour on an ordinary laptop, against seven seconds
-                for `inventory`. The README offers one command for all six
-                without saying that, which is worth knowing before running it
+  --all         every row recomputed: 855s on an ordinary laptop, of which
+                `joint-pricing` is 626 and `inventory` is 7. Too slow to sit in
+                front of every push given how often a branch here has to be
+                brought up to date, and run weekly instead. The README offers
+                one command for all six without mentioning that one of them is
+                ninety times the others, which is worth knowing before starting
+                it and wondering whether it has hung
 
 Reproduces with exactly the command the README tells a reader to use. If that
 command stops producing the table, the README is wrong about how to reproduce

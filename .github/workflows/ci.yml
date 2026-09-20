@@ -104,9 +104,10 @@ jobs:
       #
       # This recomputes `inventory` in full -- seven seconds, at the instance and
       # episode counts the README itself quotes -- and checks the cheap claims
-      # around it. `--all` recomputes every row, and is deliberately not here:
-      # `joint-pricing` at 40x20 was still running after half an hour on an
-      # ordinary laptop, against seven seconds for `inventory`.
+      # around it. `--all` recomputes every row -- 855s, of which `joint-pricing`
+      # is 626 -- and runs weekly in headroom.yml rather than here, because
+      # fourteen minutes in front of every push is not what this repository
+      # needs when a branch already has to be brought up to date repeatedly.
       - name: The headroom table is the table the benchmark produces
         run: python scripts/check_readme.py
 
