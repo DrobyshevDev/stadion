@@ -97,6 +97,20 @@ jobs:
             done
           done
 
+      # The headroom table in both READMEs is forty-eight hand-typed numbers,
+      # and they are the most specific claims published anywhere here: "+0.4% on
+      # inventory" is what the next paragraph leans on to say that an agent
+      # reporting a large improvement there has a bug rather than a policy.
+      #
+      # This recomputes `inventory` in full -- seven seconds, at the instance and
+      # episode counts the README itself quotes -- and checks the cheap claims
+      # around it. `--all` recomputes every row -- 855s, of which `joint-pricing`
+      # is 626 -- and runs weekly in headroom.yml rather than here, because
+      # fourteen minutes in front of every push is not what this repository
+      # needs when a branch already has to be brought up to date repeatedly.
+      - name: The headroom table is the table the benchmark produces
+        run: python scripts/check_readme.py
+
   ci:
     name: CI
     runs-on: ubuntu-latest
