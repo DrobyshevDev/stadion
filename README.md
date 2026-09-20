@@ -92,6 +92,32 @@ same task without either being translated through the other's interface. For a
 language model, `stadion.llm.LLMAgent` takes any `prompt -> reply` callable —
 no client library, no provider.
 
+### Running a language model
+
+An episode is a chain of round-trips: a decision cannot start until the previous
+one's outcome is known, so a model spends the evaluation waiting rather than
+computing. Instances do not depend on each other, so run them at once.
+
+```python
+report = stadion.evaluate(task, lambda: LLMAgent(complete), instances=20, workers=8)
+```
+
+Above one worker the first argument is a factory, not an agent — an agent that
+remembers anything within an episode cannot be shared across threads. The
+numbers are identical either way; every seed is fixed before the pool starts.
+
+Budget the run in model calls first. One episode costs one call per decision:
+
+| Task | Calls per episode | Menu |
+|---|---:|---:|
+| `queueing` | 100 | 2 |
+| `inventory`, `energy`, `supply-chain` | 60 | 9, 9, 25 |
+| `joint-pricing` | 40 | 48 |
+| `pricing` | ~5 | 8 |
+
+One episode of every task is about 325 calls, so a run of eight instances by two
+episodes across all six is roughly 5,200.
+
 From the shell:
 
 ```bash
