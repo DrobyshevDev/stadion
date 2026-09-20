@@ -13,3 +13,6 @@ htmlcov/
 runs/
 *.jsonl
 !tests/**/*.jsonl
+
+# The documentation build output; the site is published from CI, not committed.
+site/
