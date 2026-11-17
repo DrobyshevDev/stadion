@@ -11,8 +11,8 @@ before the run, so they cannot have been memorised from a public dataset.
 ## The agent is told everything the baseline is told
 
 The brief states the instance's full parameters, because the classical rule is
-built from those same parameters. Withholding them would not make the comparison
-harder — it would make it dishonest.
+built from those same parameters. Hiding them from the agent would make the
+comparison unfair.
 
 ## What the agent does not get is the tuning budget
 

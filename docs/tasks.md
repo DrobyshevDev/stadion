@@ -40,17 +40,17 @@ stadion run <task> --agent classical --instances 40 --episodes 20
 | `supply-chain` | −37.532 | −31.027 | +17.3% | [+5.505, +7.493] |
 | `energy` | 16.778 | 21.234 | **+26.6%** | [+4.221, +4.690] |
 
-The spread is the point. A price threshold with no forecast leaves a quarter of
+The spread is intentional. A price threshold with no forecast leaves a quarter of
 the battery's value unclaimed, because it cannot decide to arrive at the evening
 peak full. At the other end the newsvendor formula is within half a percent of
 the exact optimum — there is almost nothing to win on `inventory`, and an agent
-that reports a large improvement there has a bug, not a policy.
+that reports a large improvement there most likely has a bug.
 
 !!! note "What a wide benchmark would hide"
 
-    A benchmark whose tasks all have generous headroom has quietly selected for
-    problems where the classical answer is bad. Publishing the spread is what
-    makes that visible.
+    A benchmark where every task leaves a lot of headroom would only contain
+    problems where the classical method is weak. Publishing the spread makes that
+    visible.
 
 ## joint-pricing, and the claim it corrected
 

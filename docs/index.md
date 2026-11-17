@@ -1,10 +1,10 @@
 # stadion
 
-**A proving ground for operational decisions.** An agent is scored against two
-references it cannot argue with: the classical operations-research method for the
-problem, and the exact optimum. The result is a normalised score with a
-confidence interval — and *"indistinguishable from the classical method"* is a
-first-class outcome, not a rounding error.
+A benchmark for agents on operational decisions. An agent is compared with two
+references: the classical operations-research method for the problem and the
+exact optimum. The result is a normalised score with a confidence interval, and
+"no measurable difference from the classical method" is one of the possible
+results.
 
 ```bash
 pip install stadion-rl
@@ -13,18 +13,18 @@ pip install stadion-rl
 The import package is `stadion`; the distribution carries the `-rl` suffix
 because PyPI's `stadion` belongs to an unrelated causal-modelling package.
 
-## Why another gym
+## Motivation
 
-The environments an agent can be trained and measured on today are mostly code,
-browsers and SaaS workflows. They share a problem: **nobody knows what the right
-answer was.** A score of 61% on such a benchmark tells you an agent beat other
-agents, not whether it did well.
+Most environments for training and evaluating agents today are about code,
+browsers and SaaS workflows. In those tasks the correct answer is usually
+unknown, so a score of 61% shows how an agent compares with other agents, but
+not how good its decisions are.
 
-στάδιον is both the racecourse and a unit of length. These tasks are picked so
-that they can be both: each is a decision a business makes thousands of times a
-day, each has a textbook method a practitioner would reach for, and each is small
-enough that the true optimum can be *computed* by backward induction rather than
-approximated. So every run puts three numbers on one scale.
+The tasks here are chosen so that each is a decision a business makes many times
+a day, each has a standard textbook method, and each is small enough for the
+exact optimum to be computed by backward induction. Every run therefore reports
+three numbers on one scale: the agent, the classical method and the optimum. The
+name στάδιον means both a racecourse and a unit of length.
 
 ## What a run looks like
 
