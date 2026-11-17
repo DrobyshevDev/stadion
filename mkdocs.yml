@@ -1,6 +1,6 @@
 site_name: stadion
 site_description: >-
-  A proving ground for operational decisions. An agent is scored against the
+  A benchmark for agents on operational decisions: each result is compared with a
   tuned classical method and the exact optimum, with a confidence interval.
 site_url: https://drobyshevdev.github.io/stadion/
 repo_url: https://github.com/DrobyshevDev/stadion
