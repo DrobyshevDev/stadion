@@ -1,10 +1,10 @@
 # stadion
 
-**A proving ground for operational decisions.** An agent is scored against two
-references it cannot argue with: the classical operations-research method for
-the problem, and the exact optimum. The result is a normalised score with a
-confidence interval — and *"indistinguishable from the classical method"* is a
-first-class outcome, not a rounding error.
+A benchmark for agents on operational decisions. An agent is compared with two
+references: the classical operations-research method for the problem and the
+exact optimum. The result is a normalised score with a confidence interval, and
+"no measurable difference from the classical method" is one of the possible
+results.
 
 [![CI](https://github.com/DrobyshevDev/stadion/actions/workflows/ci.yml/badge.svg)](https://github.com/DrobyshevDev/stadion/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/DrobyshevDev/stadion/actions/workflows/codeql.yml/badge.svg)](https://github.com/DrobyshevDev/stadion/actions/workflows/codeql.yml)
@@ -19,18 +19,18 @@ first-class outcome, not a rounding error.
 
 ---
 
-## Why another gym
+## Motivation
 
-The environments an agent can be trained and measured on today are mostly code,
-browsers and SaaS workflows. They share a problem: **nobody knows what the right
-answer was.** A score of 61% on such a benchmark tells you an agent beat other
-agents, not whether it did well.
+Most environments for training and evaluating agents today are about code,
+browsers and SaaS workflows. In those tasks the correct answer is usually
+unknown, so a score of 61% shows how an agent compares with other agents, but
+not how good its decisions are.
 
-στάδιον is both the racecourse and a unit of length. These tasks are picked so
-that they can be both: each is a decision a business makes thousands of times a
-day, each has a textbook method a practitioner would reach for, and each is
-small enough that the true optimum can be *computed* by backward induction
-rather than approximated. So every run puts three numbers on one scale.
+The tasks here are chosen so that each is a decision a business makes many times
+a day, each has a standard textbook method, and each is small enough for the
+exact optimum to be computed by backward induction. Every run therefore reports
+three numbers on one scale: the agent, the classical method and the optimum. The
+name στάδιον means both a racecourse and a unit of length.
 
 Here is `examples/scarcity.py` — price higher when stock is scarce relative to
 the time left, lower when it is piling up. The right shape, the rule most people
@@ -164,13 +164,13 @@ Measured over 40 instances × 20 episodes; reproduce with
 | `supply-chain` | −37.532 | −31.027 | +17.3% | [+5.505, +7.493] |
 | `energy` | 16.778 | 21.234 | **+26.6%** | [+4.221, +4.690] |
 
-The spread is the point. A price threshold with no forecast leaves a quarter of
+The spread is intentional. A price threshold with no forecast leaves a quarter of
 the battery's value unclaimed, because it cannot decide to arrive at the evening
 peak full. At the other end the newsvendor formula is within half a percent of
 the exact optimum — there is almost nothing to win on `inventory`, and an agent
-that reports a large improvement there has a bug, not a policy. A benchmark whose
-tasks all have generous headroom has quietly selected for problems where the
-classical answer is bad.
+that reports a large improvement there most likely has a bug. A benchmark where
+every task leaves a lot of headroom would only contain problems where the
+classical method is weak.
 
 `joint-pricing` is the case that changed our mind about something. Its
 environment is built around a coupling — the right price depends on how much
@@ -190,8 +190,7 @@ have been memorised from a public dataset.
 
 **The agent is told everything the baseline is told.** The brief states the
 instance's full parameters, because the classical rule is built from those same
-parameters — withholding them would not make the comparison harder, it would
-make it dishonest.
+parameters. Hiding them from the agent would make the comparison unfair.
 
 **What the agent does not get is the tuning budget.** Where the classical rule
 has a free parameter, it is fitted by search over practice episodes on seeds
